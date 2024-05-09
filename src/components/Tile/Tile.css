@@ -1,3 +1,7 @@
+/*
+  Tile styiling. Contains hover and active for chess-piece for mouse interaction.
+*/
+
 .tile {
   display: grid;
   place-content: center;

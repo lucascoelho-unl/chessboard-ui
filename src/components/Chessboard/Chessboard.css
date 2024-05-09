@@ -1,3 +1,7 @@
+/*
+  Chess board display information. Uses a grid display with rows and columns. 
+*/
+
 #chessboard {
   display: grid;
   grid-template-columns: repeat(8, 100px);

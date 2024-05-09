@@ -1,6 +1,10 @@
 import Tile from '../Tile/Tile';
 import './Chessboard.css'
 
+/**
+ * Interface that models a Piece. 
+ * Image refers to public repository of assets.
+ */
 interface Piece {
     image: string;
     horizontalPosition: number;
@@ -9,13 +13,22 @@ interface Piece {
 
 let activePiece: HTMLElement | null = null;
 
+// FEN notation for building positions
 const initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 const dificultPosition = "8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b"
 
+// Setting up the board
 const verticalAxis = ["1", "2", "3", "4", "5", "6", "7", "8"]
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"]
 const pieces: Piece[] = readBoard(initialPosition)
 
+/**
+ * Chess board. 
+ * Creates a chessboard to the HTML page. 
+ * Sets the pieces to correct places with FEN notation.
+ * 
+ * @returns a div of the entire chessboard with OnMouseMove commands for interaction with pieces
+ */
 export default function Chessboard() {
     let board = [];
 
@@ -49,6 +62,13 @@ export default function Chessboard() {
     );
 }
 
+
+/**
+ * Move pieces function. Called when piece is active (is clicked).
+ * Sets the piece div have its location equal to the mouse location.
+ * 
+ * @param e 
+ */
 function movePiece(e: React.MouseEvent) {
     if (activePiece) {
         const x = e.clientX - 50
@@ -59,6 +79,13 @@ function movePiece(e: React.MouseEvent) {
     }
 }
 
+/**
+ * Selects a piece and stores it in a global scope variable.
+ * Sets the piece selected to be grabed by the mouse.
+ * After it happens, calls the move piece.
+ * 
+ * @param e 
+ */
 function grabPiece(e: React.MouseEvent) {
     const element = e.target as HTMLElement
     if (element.classList.contains("chess-piece")) {
@@ -72,34 +99,54 @@ function grabPiece(e: React.MouseEvent) {
     }
 }
 
+/**
+ * Function to drop the piece when click is released.
+ * 
+ * @param e 
+ */
 function dropPiece(e: React.MouseEvent) {
     if (activePiece) {
         activePiece = null
     }
 }
 
+/**
+ * Function to read board based on FEN notation. 
+ * 
+ * @param position 
+ * @returns a list of the pieces with correct positions
+ */
 function readBoard(position: string) {
+    // Initialize a pieces list 
     let pieces: Piece[] = []
     let rank = 7;
     let file = 0;
+    // Loop trough all the characters in the FEN string
     for (let i = 0; i < position.length; i++) {
 
         let currChar = position[i]
 
+        // Base case. If hits the first space, return the list of pieces
+        // TODO: read the rest of the FEN string (who's move, possible moves, how many moves each player has)
         if (currChar == " ") {
             return pieces
         }
+        // If the char is / reset the file, and go down one rank. 
         else if (currChar == "/") {
             rank--
             file = 0
         }
         else {
-            let currPiece = determinePiece(currChar);
+            // If none of the base cases hit, create the piece instance.
+            // Calls determine piece function to return what piece we are currently itterating.
+            let currPiece = determinePiece(currChar)
 
+            // If the piece is not an empty string, create a piece with a set position. 
             if (currPiece !== "") {
                 pieces.push({ image: currPiece, horizontalPosition: rank, verticalPosition: file })
                 file++
             }
+            // If the is an empty string, make it a number, and add to the file to properly handle FEN notation.
             else {
                 let currNum = Number(currChar)
                 file += currNum
@@ -109,7 +156,12 @@ function readBoard(position: string) {
     return pieces;
 }
 
-
+/**
+ * Determines which piece is passed as an argument.
+ * 
+ * @param char 
+ * @returns A path for the piece's .png. If not a valid piece, return empty string.
+ */
 function determinePiece(char: string) {
     if (char == "k") {
         return "assets/images/king_b.png"

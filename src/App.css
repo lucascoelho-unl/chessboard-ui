@@ -1,3 +1,8 @@
+/* 
+  Style for the app div. 
+  With a semi-black background and a display of center. 
+*/
+
 #app {
   display: grid;
   place-content: center;
