@@ -3,7 +3,7 @@
 */
 
 .tile {
-  display: grid;
+  display: flex;
   place-content: center;
   width: 100px;
   height: 100px;
@@ -12,8 +12,8 @@
 .tile .chess-piece {
   width: 100px;
   height: 100px;
-  background-position: center;
   background-size: 90px;
+  background-position: center;
   background-repeat: no-repeat;
 }
 

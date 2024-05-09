@@ -2,18 +2,19 @@
   Chess board display information. Uses a grid display with rows and columns. 
 */
 
+/* CSS for Chessboard */
+#chessboard-container {
+  position: relative;
+}
+
 #chessboard {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(8, 100px);
   grid-template-rows: repeat(8, 100px);
   width: 800px;
   height: 800px;
-  background-color: blue;
-}
-
-/* CSS for Chessboard */
-#chessboard-container {
-  position: relative; /* Set container position to relative */
+  background-color: rgb(228, 124, 222);
 }
 
 /* Styling for column labels */

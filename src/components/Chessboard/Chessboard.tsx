@@ -12,9 +12,6 @@ interface Piece {
 }
 
 let activePiece: HTMLElement | null = null;
-let isPieceGrabbed = false; // Add a flag to track if a piece is grabbed
-let offsetX = 0; // Add variables to store the offset between mouse and piece position
-let offsetY = 0;
 
 // FEN notation for building positions
 const initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -90,16 +87,21 @@ export default function Chessboard() {
 }
 
 /**
- * Function to move the grabbed piece according to mouse movement.
+ * Move pieces function. Called when piece is active (is clicked).
+ * Sets the piece div have its location equal to the mouse location.
  * 
  * @param e 
  */
-function movePiece(e: React.MouseEvent<HTMLDivElement, MouseEvent>
-) {
-    if (isPieceGrabbed && activePiece) {
-        // Calculate the new position of the piece based on mouse position and offset
-        const x = e.clientX - offsetX;
-        const y = e.clientY - offsetY;
+function movePiece(e: React.MouseEvent) {
+    if (activePiece) {
+        // Calculate the new position relative to the chessboard container
+        const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
+        if (!chessboardContainerRect) return;
+
+        const offsetX = activePiece.offsetWidth / 2;
+        const offsetY = activePiece.offsetHeight / 2;
+        const x = e.clientX - chessboardContainerRect.left - offsetX;
+        const y = e.clientY - chessboardContainerRect.top - offsetY;
 
         // Update the position of the active piece
         activePiece.style.left = `${x}px`;
@@ -108,19 +110,39 @@ function movePiece(e: React.MouseEvent<HTMLDivElement, MouseEvent>
 }
 
 /**
- * Selects a piece and makes it follow the mouse.
+ * Selects a piece and stores it in a global scope variable.
+ * Sets the piece selected to be grabed by the mouse.
+ * After it happens, calls the move piece.
  * 
  * @param e 
  */
-function grabPiece(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+function grabPiece(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
     if (element.classList.contains("chess-piece")) {
-        isPieceGrabbed = true; // Set the flag to indicate a piece is grabbed
+        // Calculate the position of the chessboard container relative to the viewport
+        const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
+        if (!chessboardContainerRect) return;
 
-        // Calculate the offset between mouse position and piece position
-        offsetX = e.clientX - element.getBoundingClientRect().left;
-        offsetY = e.clientY - element.getBoundingClientRect().top;
+        // Calculate the size of each grid cell
+        const gridCellWidth = chessboardContainerRect.width / 8;
+        const gridCellHeight = chessboardContainerRect.height / 8;
 
+        // Calculate the position of the clicked grid cell
+        const gridCellX = Math.floor((e.clientX - chessboardContainerRect.left) / gridCellWidth);
+        const gridCellY = Math.floor((e.clientY - chessboardContainerRect.top) / gridCellHeight);
+
+        // Calculate the position of the piece within the grid cell (centered)
+        const offsetX = element.offsetWidth / 2;
+        const offsetY = element.offsetHeight / 2;
+        const x = (gridCellX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
+        const y = (gridCellY * gridCellHeight) + (gridCellHeight / 2) - offsetY;
+
+        // Set the initial position of the piece
+        element.style.position = "absolute";
+        element.style.left = `${x}px`;
+        element.style.top = `${y}px`;
+
+        // Store the active piece
         activePiece = element;
     }
 }
@@ -130,13 +152,9 @@ function grabPiece(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
  * 
  * @param e 
  */
-function dropPiece(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (isPieceGrabbed) {
-        isPieceGrabbed = false; // Reset the flag to indicate no piece is grabbed
-        activePiece = null;
-
-        // Stop following the mouse by removing the event listener for mousemove event on document
-        document.removeEventListener("mousemove", movePiece);
+function dropPiece(e: React.MouseEvent) {
+    if (activePiece) {
+        activePiece = null
     }
 }
 
