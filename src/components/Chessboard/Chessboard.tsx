@@ -154,6 +154,28 @@ function grabPiece(e: React.MouseEvent) {
  */
 function dropPiece(e: React.MouseEvent) {
     if (activePiece) {
+        const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
+        const element = e.target as HTMLElement;
+        if (!chessboardContainerRect) return;
+
+        // Calculate the size of each grid cell
+        const gridCellWidth = chessboardContainerRect.width / 8;
+        const gridCellHeight = chessboardContainerRect.height / 8;
+
+        // Calculate the position of the clicked grid cell
+        const gridCellX = Math.floor((e.clientX - chessboardContainerRect.left) / gridCellWidth);
+        const gridCellY = Math.floor((e.clientY - chessboardContainerRect.top) / gridCellHeight);
+
+        // Calculate the position of the piece within the grid cell (centered)
+        const offsetX = element.offsetWidth / 2;
+        const offsetY = element.offsetHeight / 2;
+        const x = (gridCellX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
+        const y = (gridCellY * gridCellHeight) + (gridCellHeight / 2) - offsetY;
+
+        // Set the initial position of the piece
+        element.style.position = "absolute";
+        element.style.left = `${x}px`;
+        element.style.top = `${y}px`;
         activePiece = null
     }
 }
