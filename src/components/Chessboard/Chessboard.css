@@ -9,11 +9,11 @@
 
 #chessboard {
   position: relative;
+  height: 800px;
+  width: 800px;
   display: grid;
   grid-template-columns: repeat(8, 100px);
   grid-template-rows: repeat(8, 100px);
-  width: 800px;
-  height: 800px;
   background-color: rgb(228, 124, 222);
 }
 

@@ -22,6 +22,9 @@ const verticalAxis = ["1", "2", "3", "4", "5", "6", "7", "8"]
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"]
 const pieces: Piece[] = readBoard(initialPosition)
 
+let oldX = 0
+let oldY = 0
+
 // RowLabel component
 const RowLabel = ({ label }: { label: string }) => {
     return <div className="row-label">{label}</div>;
@@ -137,6 +140,9 @@ function grabPiece(e: React.MouseEvent) {
         const x = (gridCellX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
         const y = (gridCellY * gridCellHeight) + (gridCellHeight / 2) - offsetY;
 
+        oldX = x
+        oldY = y
+
         // Set the initial position of the piece
         element.style.position = "absolute";
         element.style.left = `${x}px`;
@@ -154,8 +160,8 @@ function grabPiece(e: React.MouseEvent) {
  */
 function dropPiece(e: React.MouseEvent) {
     if (activePiece) {
-        const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
         const element = e.target as HTMLElement;
+        const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
         if (!chessboardContainerRect) return;
 
         // Calculate the size of each grid cell
@@ -172,10 +178,17 @@ function dropPiece(e: React.MouseEvent) {
         const x = (gridCellX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
         const y = (gridCellY * gridCellHeight) + (gridCellHeight / 2) - offsetY;
 
-        // Set the initial position of the piece
-        element.style.position = "absolute";
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
+        if (inBoardBounds(e.clientX, e.clientY)) {
+            // Set the initial position of the piece
+            element.style.position = "absolute";
+            element.style.left = `${x}px`;
+            element.style.top = `${y}px`;
+        }
+        else {
+            element.style.position = "absolute";
+            element.style.left = `${oldX}px`;
+            element.style.top = `${oldY}px`;
+        }
         activePiece = null
     }
 }
@@ -271,5 +284,17 @@ function determinePiece(char: string) {
     }
     else {
         return ""
+    }
+}
+
+function inBoardBounds(x: number, y: number) {
+    const chessboardContainerRect = document.getElementById("chessboard")?.getBoundingClientRect();
+    if (chessboardContainerRect) {
+        const minX = chessboardContainerRect.left
+        const maxX = chessboardContainerRect.right
+        const minY = chessboardContainerRect.top
+        const maxY = chessboardContainerRect.bottom
+
+        return ((x >= minX) && (x <= maxX) && (y >= minY) && (y <= maxY))
     }
 }
