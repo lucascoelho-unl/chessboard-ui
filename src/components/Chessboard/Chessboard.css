@@ -10,3 +10,45 @@
   height: 800px;
   background-color: blue;
 }
+
+/* CSS for Chessboard */
+#chessboard-container {
+  position: relative; /* Set container position to relative */
+}
+
+/* Styling for column labels */
+.column-labels {
+  position: absolute; /* Position the column labels absolutely */
+  top: 800px; /* Align labels to the top */
+  left: -10px; /* Align labels to the left */
+  width: 110%; /* Occupy the full width of the container */
+  display: flex; /* Use flexbox to align labels horizontally */
+  justify-content: space-evenly; /* Space out labels evenly */
+}
+
+/* Styling for individual column label */
+.column-label {
+  font-size: 22px; /* Adjust label font size */
+  font-weight: bold; /* Make labels bold */
+  color: #ebecd0; /* Set label color */
+  padding: 5px; /* Add padding for spacing */
+}
+
+/* Styling for row labels */
+.row-labels {
+  position: absolute; /* Position the row labels absolutely */
+  top: -67px; /* Align labels to the top */
+  left: -30px; /* Align labels to the left */
+  height: 108%; /* Occupy the full height of the container */
+  display: flex; /* Use flexbox to align labels vertically */
+  flex-direction: column; /* Align labels vertically */
+  justify-content: space-evenly; /* Space out labels evenly */
+}
+
+/* Styling for individual row label */
+.row-label {
+  font-size: 22px; /* Adjust label font size */
+  font-weight: bold; /* Make labels bold */
+  color: #ebecd0; /* Set label color */
+  padding: 5px; /* Add padding for spacing */
+}
