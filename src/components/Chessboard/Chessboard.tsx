@@ -246,45 +246,30 @@ function readBoard(position: string) {
  * @returns A path for the piece's .png. If not a valid piece, return empty string.
  */
 function determinePiece(char: string) {
-    if (char === "k") {
-        return "assets/images/king_b.png"
+    let returnString = ""
+    switch (char) {
+        // Case for King.
+        case "k": returnString = "assets/images/king_b.png"; break
+        case "K": returnString = "assets/images/king_w.png"; break
+        // Case for Queen.
+        case "q": returnString = "assets/images/queen_b.png"; break
+        case "Q": returnString = "assets/images/queen_w.png"; break
+        // Case for bishop
+        case "b": returnString = "assets/images/bishop_b.png"; break
+        case "B": returnString = "assets/images/bishop_w.png"; break
+        // Case for knight
+        case "n": returnString = "assets/images/knight_b.png"; break
+        case "N": returnString = "assets/images/knight_w.png"; break
+        // Case for rook
+        case "r": returnString = "assets/images/rook_b.png"; break
+        case "R": returnString = "assets/images/rook_w.png"; break
+        // Case for pawn
+        case "p": returnString = "assets/images/pawn_b.png"; break
+        case "P": returnString = "assets/images/pawn_w.png"; break
+        // Default case: empty string
+        default: returnString = "";
     }
-    else if (char === "K") {
-        return "assets/images/king_w.png"
-    }
-    else if (char === "q") {
-        return "assets/images/queen_b.png"
-    }
-    else if (char === "Q") {
-        return "assets/images/queen_w.png"
-    }
-    else if (char === "b") {
-        return "assets/images/bishop_b.png"
-    }
-    else if (char === "B") {
-        return "assets/images/bishop_w.png"
-    }
-    else if (char === "n") {
-        return "assets/images/knight_b.png"
-    }
-    else if (char === "N") {
-        return "assets/images/knight_w.png"
-    }
-    else if (char === "r") {
-        return "assets/images/rook_b.png"
-    }
-    else if (char === "R") {
-        return "assets/images/rook_w.png"
-    }
-    else if (char === "p") {
-        return "assets/images/pawn_b.png"
-    }
-    else if (char === "P") {
-        return "assets/images/pawn_w.png"
-    }
-    else {
-        return ""
-    }
+    return returnString
 }
 
 function inBoardBounds(x: number, y: number) {
