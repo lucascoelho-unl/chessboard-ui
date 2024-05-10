@@ -25,14 +25,7 @@
   width: 110%; /* Occupy the full width of the container */
   display: flex; /* Use flexbox to align labels horizontally */
   justify-content: space-evenly; /* Space out labels evenly */
-}
-
-/* Styling for individual column label */
-.column-label {
-  font-size: 22px; /* Adjust label font size */
-  font-weight: bold; /* Make labels bold */
-  color: #ebecd0; /* Set label color */
-  padding: 5px; /* Add padding for spacing */
+  pointer-events: none;
 }
 
 /* Styling for row labels */
@@ -44,12 +37,16 @@
   display: flex; /* Use flexbox to align labels vertically */
   flex-direction: column; /* Align labels vertically */
   justify-content: space-evenly; /* Space out labels evenly */
+  pointer-events: none;
 }
 
-/* Styling for individual row label */
-.row-label {
-  font-size: 22px; /* Adjust label font size */
-  font-weight: bold; /* Make labels bold */
-  color: #ebecd0; /* Set label color */
-  padding: 5px; /* Add padding for spacing */
+/* CSS for Row and Column Labels */
+.row-label,
+.column-label {
+  font-size: 22px;
+  font-weight: bold;
+  color: #ebecd0;
+  padding: 5px;
+  user-select: none; /* Prevent text selection */
+  pointer-events: none; /* Prevent the label from being the target of mouse events */
 }
