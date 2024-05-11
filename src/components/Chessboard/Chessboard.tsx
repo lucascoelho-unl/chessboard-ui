@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Tile from '../Tile/Tile'
 import './Chessboard.css'
+import Referee from '../../referee/Referee'
 
 /**
  * Interface that models a Piece. 
@@ -10,6 +11,23 @@ interface Piece {
     image: string;
     horizontalPosition: number;
     verticalPosition: number;
+    type: PieceType;
+    color: PieceColor
+}
+
+export enum PieceColor {
+    BLACK,
+    WHITE
+}
+
+export enum PieceType {
+    PAWN,
+    BISHOP,
+    KNIGHT,
+    ROOK,
+    QUEEN,
+    KING,
+    UNDEFINED
 }
 
 let activePiece: HTMLElement | null = null;
@@ -49,6 +67,7 @@ export default function Chessboard() {
     const [initialGridX, setGridX] = useState(0)
     const [initialGridY, setGridY] = useState(0)
     const [pieces, setPieces] = useState<Piece[]>(initialBoardState)
+    const referee = new Referee()
 
     useEffect(() => {
         setPieces(pieces)
@@ -162,45 +181,54 @@ export default function Chessboard() {
             const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
             if (!chessboardContainerRect) return;
 
-            if (inBoardBounds(e.clientX, e.clientY)) {
-                // If dropped inside the board boundaries, update the position of the piece
-                const gridCellX = Math.floor((e.clientX - chessboardContainerRect.left) / (chessboardContainerRect.width / 8));
-                const gridCellY = Math.abs(Math.ceil((e.clientY - chessboardContainerRect.top - 800) / (chessboardContainerRect.height / 8)));
+            // If dropped inside the board boundaries, update the position of the piece
+            const gridCellX = Math.floor((e.clientX - chessboardContainerRect.left) / (chessboardContainerRect.width / 8));
+            const gridCellY = Math.abs(Math.ceil((e.clientY - chessboardContainerRect.top - 800) / (chessboardContainerRect.height / 8)));
 
-                // Update the position of the piece in the state
-                const updatedPieces = pieces.map(piece => {
-                    if (piece.horizontalPosition === initialGridY && piece.verticalPosition === initialGridX) {
-                        // Snap the piece back to its original position
-                        if ((gridCellX === initialGridX) && (gridCellY === initialGridY)) {
-                            // Calculate the size of each grid cell
-                            const gridCellWidth = chessboardContainerRect.width / 8;
-                            const gridCellHeight = chessboardContainerRect.height / 8;
+            // Update the position of the piece in the state
+            const updatedPieces = pieces.map(piece => {
+                if (piece.horizontalPosition === initialGridY && piece.verticalPosition === initialGridX) {
+                    // Snap the piece back to its original position
 
-                            // Calculate the position of the clicked grid cell
-                            const gridCellX = Math.floor((e.clientX - chessboardContainerRect.left) / gridCellWidth);
-                            const gridCellY = Math.floor((e.clientY - chessboardContainerRect.top) / gridCellHeight);
+                    if (!inBoardBounds(e.clientX, e.clientY)) {
+                        const element = e.target as HTMLElement;
+                        // Calculate the size of each grid cell
+                        const gridCellWidth = chessboardContainerRect.width / 8;
+                        const gridCellHeight = chessboardContainerRect.height / 8;
 
-                            // Calculate the position of the piece within the grid cell (centered)
-                            const offsetX = 100 / 2;
-                            const offsetY = 100 / 2;
+                        // Calculate the position of the piece within the grid cell (centered)
+                        const offsetX = element.offsetWidth / 2;
+                        const offsetY = element.offsetHeight / 2;
+                        const x = (initialGridX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
+                        const y = Math.abs((initialGridY * gridCellHeight - 700) + (gridCellHeight / 2) - offsetY);
 
-                            const x = (gridCellX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
-                            const y = (gridCellY * gridCellHeight) + (gridCellHeight / 2) - offsetY;
+                        // Set the initial position of the piece
+                        element.style.position = "absolute";
+                        element.style.left = `${x}px`;
+                        element.style.top = `${y}px`;
 
-                            activePiece!.style.left = `${x}px`;
-                            activePiece!.style.top = `${y}px`;
-                        }
-                        else {
-                            piece.verticalPosition = gridCellX
-                            piece.horizontalPosition = gridCellY
-                            setGridX(gridCellX)
-                            setGridY(gridCellY)
-                        }
+                        console.log(`Current  positions: (${x}, ${y})`)
+                        console.log(`Previous positions: (${initialGridX}, ${initialGridY})`)
                     }
-                    return piece
-                })
-                setPieces(updatedPieces);
-            }
+                    else if (referee.isValidMove(initialGridX, initialGridY, gridCellX, gridCellY, piece.type, piece.color)) {
+
+                        piece.verticalPosition = gridCellX
+                        piece.horizontalPosition = gridCellY
+                        setGridX(gridCellX)
+                        setGridY(gridCellY)
+
+                    }
+                    else {
+                        activePiece!.style.position = 'relative'
+                        activePiece!.style.removeProperty('top')
+                        activePiece!.style.removeProperty('left')
+                    }
+
+                }
+                return piece
+            })
+            setPieces(updatedPieces);
+
         }
 
         // Reset the active piece
@@ -238,10 +266,12 @@ function readBoard(position: string) {
             // If none of the base cases hit, create the piece instance.
             // Calls determine piece function to return what piece we are currently itterating.
             let currPiece = determinePiece(currChar)
+            let currColor = determineColor(currChar)
+            let currType = determineType(currChar.toLocaleLowerCase())
 
             // If the piece is not an empty string, create a piece with a set position. 
             if (currPiece !== "") {
-                pieces.push({ image: currPiece, horizontalPosition: rank, verticalPosition: file })
+                pieces.push({ image: currPiece, horizontalPosition: rank, verticalPosition: file, type: currType, color: currColor })
                 file++
             }
             // If the is an empty string, make it a number, and add to the file to properly handle FEN notation.
@@ -285,6 +315,43 @@ function determinePiece(char: string) {
         default: returnString = "";
     }
     return returnString
+}
+
+function determineType(char: string) {
+    switch (char) {
+        case "k": return PieceType.KING; break
+        case "q": return PieceType.QUEEN; break
+        case "r": return PieceType.ROOK; break
+        case "b": return PieceType.BISHOP; break
+        case "n": return PieceType.KNIGHT; break
+        case "p": return PieceType.PAWN; break
+        default: return PieceType.UNDEFINED;
+    }
+}
+
+function determineColor(char: string) {
+    switch (char) {
+        // Case for King.
+        case "k": return PieceColor.BLACK; break
+        case "K": return PieceColor.WHITE; break
+        // Case for Queen.
+        case "q": return PieceColor.BLACK; break
+        case "Q": return PieceColor.WHITE; break
+        // Case for bishop
+        case "b": return PieceColor.BLACK; break
+        case "B": return PieceColor.WHITE; break
+        // Case for knight
+        case "n": return PieceColor.BLACK; break
+        case "N": return PieceColor.WHITE; break
+        // Case for rook
+        case "r": return PieceColor.BLACK; break
+        case "R": return PieceColor.WHITE; break
+        // Case for pawn
+        case "p": return PieceColor.BLACK; break
+        case "P": return PieceColor.WHITE; break
+        // Default case: empty string
+        default: return PieceColor.WHITE;
+    }
 }
 
 function inBoardBounds(x: number, y: number) {
