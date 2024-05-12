@@ -4,49 +4,49 @@
 
 /* CSS for Chessboard */
 #chessboard-container {
-  position: relative;
+	position: relative;
 }
 
 #chessboard {
-  position: relative;
-  height: 800px;
-  width: 800px;
-  display: grid;
-  grid-template-columns: repeat(8, 100px);
-  grid-template-rows: repeat(8, 100px);
-  background-color: rgb(228, 124, 222);
+	position: relative;
+	height: 800px;
+	width: 800px;
+	display: grid;
+	grid-template-columns: repeat(8, 100px);
+	grid-template-rows: repeat(8, 100px);
+	background-color: rgb(228, 124, 222);
 }
 
 /* Styling for column labels */
 .column-labels {
-  position: absolute; /* Position the column labels absolutely */
-  top: 800px; /* Align labels to the top */
-  left: -10px; /* Align labels to the left */
-  width: 110%; /* Occupy the full width of the container */
-  display: flex; /* Use flexbox to align labels horizontally */
-  justify-content: space-evenly; /* Space out labels evenly */
-  pointer-events: none;
+	position: absolute; /* Position the column labels absolutely */
+	top: 800px; /* Align labels to the top */
+	left: -10px; /* Align labels to the left */
+	width: 110%; /* Occupy the full width of the container */
+	display: flex; /* Use flexbox to align labels horizontally */
+	justify-content: space-evenly; /* Space out labels evenly */
+	pointer-events: none;
 }
 
 /* Styling for row labels */
 .row-labels {
-  position: absolute; /* Position the row labels absolutely */
-  top: -67px; /* Align labels to the top */
-  left: -30px; /* Align labels to the left */
-  height: 108%; /* Occupy the full height of the container */
-  display: flex; /* Use flexbox to align labels vertically */
-  flex-direction: column; /* Align labels vertically */
-  justify-content: space-evenly; /* Space out labels evenly */
-  pointer-events: none;
+	position: absolute; /* Position the row labels absolutely */
+	top: -67px; /* Align labels to the top */
+	left: -30px; /* Align labels to the left */
+	height: 108%; /* Occupy the full height of the container */
+	display: flex; /* Use flexbox to align labels vertically */
+	flex-direction: column; /* Align labels vertically */
+	justify-content: space-evenly; /* Space out labels evenly */
+	pointer-events: none;
 }
 
 /* CSS for Row and Column Labels */
 .row-label,
 .column-label {
-  font-size: 22px;
-  font-weight: bold;
-  color: #ebecd0;
-  padding: 5px;
-  user-select: none; /* Prevent text selection */
-  pointer-events: none; /* Prevent the label from being the target of mouse events */
+	font-size: 22px;
+	font-weight: bold;
+	color: #ebecd0;
+	padding: 5px;
+	user-select: none; /* Prevent text selection */
+	pointer-events: none; /* Prevent the label from being the target of mouse events */
 }

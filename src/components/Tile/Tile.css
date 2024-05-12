@@ -3,36 +3,36 @@
 */
 
 .tile {
-  display: flex;
-  place-content: center;
-  width: 100px;
-  height: 100px;
+	display: flex;
+	place-content: center;
+	width: 100px;
+	height: 100px;
 }
 
 .tile .chess-piece {
-  width: 100px;
-  height: 100px;
-  background-size: 90px;
-  background-position: center;
-  background-repeat: no-repeat;
+	width: 100px;
+	height: 100px;
+	background-size: 90px;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 .title .chess-piece:hover {
-  cursor: grab;
+	cursor: grab;
 }
 
 .tile .chess-piece:active {
-  cursor: grabbing;
+	cursor: grabbing;
 }
 
 .black-tile {
-  background-color: #779556;
+	background-color: #779556;
 }
 
 .white-tile {
-  background-color: #ebecd0;
+	background-color: #ebecd0;
 }
 
 .tile img {
-  width: 90px;
+	width: 90px;
 }

@@ -7,7 +7,7 @@ import Referee from '../../referee/Referee'
  * Interface that models a Piece. 
  * Image refers to public repository of assets.
  */
-interface Piece {
+export interface Piece {
     image: string;
     horizontalPosition: number;
     verticalPosition: number;
@@ -29,8 +29,6 @@ export enum PieceType {
     KING,
     UNDEFINED
 }
-
-let activePiece: HTMLElement | null = null;
 
 // FEN notation for building positions
 const initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -67,6 +65,7 @@ export default function Chessboard() {
     const [initialGridX, setGridX] = useState(0)
     const [initialGridY, setGridY] = useState(0)
     const [pieces, setPieces] = useState<Piece[]>(initialBoardState)
+    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null)
     const referee = new Referee()
 
     useEffect(() => {
@@ -167,7 +166,7 @@ export default function Chessboard() {
             element.style.top = `${y}px`;
 
             // Store the active piece
-            activePiece = element;
+            setActivePiece(element)
         }
     }
 
@@ -207,10 +206,10 @@ export default function Chessboard() {
                         element.style.left = `${x}px`;
                         element.style.top = `${y}px`;
 
-                        console.log(`Current  positions: (${x}, ${y})`)
-                        console.log(`Previous positions: (${initialGridX}, ${initialGridY})`)
+                        // console.log(`Current  positions: (${x}, ${y})`)
+                        // console.log(`Previous positions: (${initialGridX}, ${initialGridY})`)
                     }
-                    else if (referee.isValidMove(initialGridX, initialGridY, gridCellX, gridCellY, piece.type, piece.color)) {
+                    else if (referee.isValidMove(initialGridX, initialGridY, gridCellX, gridCellY, piece.type, piece.color, pieces)) {
 
                         piece.verticalPosition = gridCellX
                         piece.horizontalPosition = gridCellY
@@ -228,11 +227,10 @@ export default function Chessboard() {
                 return piece
             })
             setPieces(updatedPieces);
-
         }
 
         // Reset the active piece
-        activePiece = null;
+        setActivePiece(null)
     }
 }
 
