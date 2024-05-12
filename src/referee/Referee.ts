@@ -4,14 +4,12 @@ import {
 	Piece,
 } from "../components/Chessboard/Chessboard";
 
-import * as ref from "./RefereeUtils";
-
 export default class Referee {
 	isValidMove(
-		px: number,
-		py: number,
-		x: number,
-		y: number,
+		prevX: number,
+		prevY: number,
+		currX: number,
+		currY: number,
 		type: PieceType,
 		color: PieceColor,
 		boardState: Piece[]
@@ -23,10 +21,85 @@ export default class Referee {
 		// console.log("-=-=-=-=-=-")
 
 		if (type === PieceType.PAWN) {
-			if (ref.isValidPawnMove(px, py, x, y, color, boardState)) {
-				return true;
+			const specialRow = color === PieceColor.WHITE ? 1 : 6;
+			const pawnDirection = color === PieceColor.WHITE ? 1 : -1;
+
+			const enPassant = isEnPassant(currX, currY, boardState, color);
+
+			// MOVEMENT LOGIC
+			if (
+				prevX === currX &&
+				prevY === specialRow &&
+				currY - prevY === 2 * pawnDirection
+			) {
+				if (
+					!tileOcupied(currX, currY, boardState) &&
+					!tileOcupied(currX, currY - pawnDirection, boardState)
+				) {
+					return true;
+				}
+			} else if (prevX === currX && currY - prevY === pawnDirection) {
+				if (!tileOcupied(currX, currY, boardState)) {
+					return true;
+				}
+			}
+
+			// ATACK LOGIC
+			else if (prevX - currX === 1 && currY - prevY === pawnDirection) {
+				// ATACK LEFT
+				console.log("atack left");
+				if (tileOcupiedByOponent(currX, currY, boardState, color)) {
+					return true;
+				}
+			} else if (
+				prevX - currX === -1 &&
+				currY - prevY === pawnDirection
+			) {
+				// ATACK RIGHT
+				console.log("atack right");
+				if (tileOcupiedByOponent(currX, currY, boardState, color)) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
+}
+
+function isEnPassant(
+	x: number,
+	y: number,
+	boardState: Piece[],
+	color: PieceColor
+) {
+	
+}
+
+function tileOcupied(x: number, y: number, boardState: Piece[]): boolean {
+	const piece = boardState.find(
+		(p) => p.verticalPosition === x && p.horizontalPosition === y
+	);
+	if (piece) {
+		return true;
+	}
+	return false;
+}
+
+function tileOcupiedByOponent(
+	x: number,
+	y: number,
+	boardState: Piece[],
+	color: PieceColor
+): boolean {
+	const piece = boardState.find(
+		(p) =>
+			p.verticalPosition === x &&
+			p.horizontalPosition === y &&
+			p.color != color
+	);
+
+	if (piece) {
+		return true;
+	}
+	return false;
 }

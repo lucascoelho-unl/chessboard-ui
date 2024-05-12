@@ -176,61 +176,63 @@ export default function Chessboard() {
      * @param e 
      */
     function dropPiece(e: React.MouseEvent) {
-        if (activePiece) {
-            const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
-            if (!chessboardContainerRect) return;
+        const chessboardContainerRect = document.getElementById("chessboard-container")?.getBoundingClientRect();
+        if (activePiece && chessboardContainerRect) {
 
             // If dropped inside the board boundaries, update the position of the piece
-            const gridCellX = Math.floor((e.clientX - chessboardContainerRect.left) / (chessboardContainerRect.width / 8));
-            const gridCellY = Math.abs(Math.ceil((e.clientY - chessboardContainerRect.top - 800) / (chessboardContainerRect.height / 8)));
+            const gridX = Math.floor((e.clientX - chessboardContainerRect.left) / (chessboardContainerRect.width / 8));
+            const gridY = Math.abs(Math.ceil((e.clientY - chessboardContainerRect.top - 800) / (chessboardContainerRect.height / 8)));
 
-            // Update the position of the piece in the state
-            const updatedPieces = pieces.map(piece => {
-                if (piece.horizontalPosition === initialGridY && piece.verticalPosition === initialGridX) {
-                    // Snap the piece back to its original position
+            if (!inBoardBounds(e.clientX, e.clientY)) {
+                // Snap the piece back to its original position
+                const element = e.target as HTMLElement;
 
-                    if (!inBoardBounds(e.clientX, e.clientY)) {
-                        const element = e.target as HTMLElement;
-                        // Calculate the size of each grid cell
-                        const gridCellWidth = chessboardContainerRect.width / 8;
-                        const gridCellHeight = chessboardContainerRect.height / 8;
+                // Calculate the size of each grid cell
+                const gridCellWidth = chessboardContainerRect.width / 8;
+                const gridCellHeight = chessboardContainerRect.height / 8;
 
-                        // Calculate the position of the piece within the grid cell (centered)
-                        const offsetX = element.offsetWidth / 2;
-                        const offsetY = element.offsetHeight / 2;
-                        const x = (initialGridX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
-                        const y = Math.abs((initialGridY * gridCellHeight - 700) + (gridCellHeight / 2) - offsetY);
+                // Calculate the position of the piece within the grid cell (centered)
+                const offsetX = element.offsetWidth / 2;
+                const offsetY = element.offsetHeight / 2;
+                const x = (initialGridX * gridCellWidth) + (gridCellWidth / 2) - offsetX;
+                const y = Math.abs((initialGridY * gridCellHeight - 700) + (gridCellHeight / 2) - offsetY);
 
-                        // Set the initial position of the piece
-                        element.style.position = "absolute";
-                        element.style.left = `${x}px`;
-                        element.style.top = `${y}px`;
+                // Set the initial position of the piece
+                element.style.position = "absolute";
+                element.style.left = `${x}px`;
+                element.style.top = `${y}px`;
 
-                        // console.log(`Current  positions: (${x}, ${y})`)
-                        // console.log(`Previous positions: (${initialGridX}, ${initialGridY})`)
-                    }
-                    else if (referee.isValidMove(initialGridX, initialGridY, gridCellX, gridCellY, piece.type, piece.color, pieces)) {
+                setActivePiece(null)
+                return pieces;
+            }
 
-                        piece.verticalPosition = gridCellX
-                        piece.horizontalPosition = gridCellY
-                        setGridX(gridCellX)
-                        setGridY(gridCellY)
+            const currentPiece = pieces.find((p) => p.verticalPosition === initialGridX && p.horizontalPosition === initialGridY)
 
-                    }
-                    else {
-                        activePiece!.style.position = 'relative'
-                        activePiece!.style.removeProperty('top')
-                        activePiece!.style.removeProperty('left')
-                    }
+            if (currentPiece) {
+                const isValidMove = referee.isValidMove(initialGridX, initialGridY, gridX, gridY, currentPiece.type, currentPiece.color, pieces)
 
+                if (isValidMove) {
+                    const updatePieces = pieces.reduce((results, piece) => {
+                        if (piece.verticalPosition === initialGridX && piece.horizontalPosition === initialGridY) {
+                            piece.verticalPosition = gridX
+                            piece.horizontalPosition = gridY
+                            results.push(piece)
+                        } else if (!(piece.verticalPosition === gridX && piece.horizontalPosition === gridY)) {
+                            results.push(piece)
+                        }
+
+                        return results
+                    }, [] as Piece[])
+
+                    setPieces(updatePieces)
+                } else {
+                    activePiece.style.position = "relative"
+                    activePiece.style.removeProperty("top")
+                    activePiece.style.removeProperty("left")
                 }
-                return piece
-            })
-            setPieces(updatedPieces);
+            }
+            setActivePiece(null)
         }
-
-        // Reset the active piece
-        setActivePiece(null)
     }
 }
 
