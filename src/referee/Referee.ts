@@ -8,8 +8,8 @@ export default class Referee {
 	isValidMove(
 		prevX: number,
 		prevY: number,
-		currX: number,
-		currY: number,
+		x: number,
+		y: number,
 		type: PieceType,
 		color: PieceColor,
 		boardState: Piece[]
@@ -24,55 +24,72 @@ export default class Referee {
 			const specialRow = color === PieceColor.WHITE ? 1 : 6;
 			const pawnDirection = color === PieceColor.WHITE ? 1 : -1;
 
-			const enPassant = isEnPassant(currX, currY, boardState, color);
-
 			// MOVEMENT LOGIC
 			if (
-				prevX === currX &&
+				prevX === x &&
 				prevY === specialRow &&
-				currY - prevY === 2 * pawnDirection
+				y - prevY === 2 * pawnDirection
 			) {
 				if (
-					!tileOcupied(currX, currY, boardState) &&
-					!tileOcupied(currX, currY - pawnDirection, boardState)
+					!tileOcupied(x, y, boardState) &&
+					!tileOcupied(x, y - pawnDirection, boardState)
 				) {
 					return true;
 				}
-			} else if (prevX === currX && currY - prevY === pawnDirection) {
-				if (!tileOcupied(currX, currY, boardState)) {
+			} else if (prevX === x && y - prevY === pawnDirection) {
+				if (!tileOcupied(x, y, boardState)) {
 					return true;
 				}
 			}
 
 			// ATACK LOGIC
-			else if (prevX - currX === 1 && currY - prevY === pawnDirection) {
+			else if (prevX - x === 1 && y - prevY === pawnDirection) {
 				// ATACK LEFT
-				console.log("atack left");
-				if (tileOcupiedByOponent(currX, currY, boardState, color)) {
+				if (tileOcupiedByOponent(x, y, boardState, color)) {
 					return true;
 				}
-			} else if (
-				prevX - currX === -1 &&
-				currY - prevY === pawnDirection
-			) {
+			} else if (prevX - x === -1 && y - prevY === pawnDirection) {
 				// ATACK RIGHT
-				console.log("atack right");
-				if (tileOcupiedByOponent(currX, currY, boardState, color)) {
+				if (tileOcupiedByOponent(x, y, boardState, color)) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-}
 
-function isEnPassant(
-	x: number,
-	y: number,
-	boardState: Piece[],
-	color: PieceColor
-) {
-	
+	isEnPassant(
+		prevX: number,
+		prevY: number,
+		x: number,
+		y: number,
+		atackingType: PieceType,
+		color: PieceColor,
+		boardState: Piece[]
+	) {
+		const pawnDirection = color === PieceColor.WHITE ? 1 : -1;
+
+		if (atackingType === PieceType.PAWN) {
+			// ATACK LOGIC
+			if (
+				(prevX - x === 1 || prevX - x === -1) &&
+				y - prevY === pawnDirection
+			) {
+				// ATACK LEFT
+				const piece = boardState.find(
+					(p) =>
+						p.enPassant &&
+						p.verticalPosition === x &&
+						p.horizontalPosition === y - pawnDirection
+				);
+				if (piece) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }
 
 function tileOcupied(x: number, y: number, boardState: Piece[]): boolean {
@@ -95,7 +112,7 @@ function tileOcupiedByOponent(
 		(p) =>
 			p.verticalPosition === x &&
 			p.horizontalPosition === y &&
-			p.color != color
+			p.color !== color
 	);
 
 	if (piece) {

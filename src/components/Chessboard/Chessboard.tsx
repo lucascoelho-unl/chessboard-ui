@@ -12,7 +12,8 @@ export interface Piece {
     horizontalPosition: number;
     verticalPosition: number;
     type: PieceType;
-    color: PieceColor
+    color: PieceColor;
+    enPassant?: boolean;
 }
 
 export enum PieceColor {
@@ -211,13 +212,49 @@ export default function Chessboard() {
             if (currentPiece) {
                 const isValidMove = referee.isValidMove(initialGridX, initialGridY, gridX, gridY, currentPiece.type, currentPiece.color, pieces)
 
-                if (isValidMove) {
+                const enPassant = referee.isEnPassant(initialGridX, initialGridY, gridX, gridY, currentPiece.type, currentPiece.color, pieces)
+
+                const pawnDirection = currentPiece.color === PieceColor.WHITE ? 1 : -1;
+
+                if (enPassant) {
                     const updatePieces = pieces.reduce((results, piece) => {
                         if (piece.verticalPosition === initialGridX && piece.horizontalPosition === initialGridY) {
                             piece.verticalPosition = gridX
                             piece.horizontalPosition = gridY
+                            piece.enPassant = false
                             results.push(piece)
-                        } else if (!(piece.verticalPosition === gridX && piece.horizontalPosition === gridY)) {
+                        }
+                        else if (!(piece.verticalPosition === gridX && piece.horizontalPosition === gridY - pawnDirection)) {
+                            if (piece.type === PieceType.PAWN) {
+                                piece.enPassant = false
+                            }
+                            results.push(piece)
+                        }
+
+                        return results
+                    }, [] as Piece[])
+
+                    setPieces(updatePieces)
+                }
+                else if (isValidMove) {
+                    const updatePieces = pieces.reduce((results, piece) => {
+                        if (piece.verticalPosition === initialGridX && piece.horizontalPosition === initialGridY) {
+                            if (Math.abs(initialGridY - gridY) === 2 && piece.type === PieceType.PAWN) {
+                                // Special Move: En Passant
+                                console.log("en passant can be made now")
+                                piece.enPassant = true
+                            } else {
+                                piece.enPassant = false
+                            }
+
+                            piece.verticalPosition = gridX
+                            piece.horizontalPosition = gridY
+                            results.push(piece)
+                        }
+                        else if (!(piece.verticalPosition === gridX && piece.horizontalPosition === gridY)) {
+                            if (piece.type === PieceType.PAWN) {
+                                piece.enPassant = false
+                            }
                             results.push(piece)
                         }
 
