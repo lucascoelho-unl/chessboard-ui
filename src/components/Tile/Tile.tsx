@@ -3,7 +3,7 @@ import "./Tile.css"
 /**
  * Instantiate a Proprieties interface to storage necessairy data
  */
-interface Proprieties {
+interface Props {
     isWhite: Boolean;
     image: string;
 }
@@ -14,7 +14,7 @@ interface Proprieties {
  * @param isWhite, image -> Proprieties 
  * @returns If isWhite = True, return a white div, else, return a black div
  */
-export default function Tile({ isWhite, image }: Proprieties) {
+export default function Tile({ isWhite, image }: Props) {
     if (isWhite) {
         return <div className="tile white-tile">
             {image !== "" && <div className="chess-piece" style={{ backgroundImage: `url(${image})` }}></div>}
