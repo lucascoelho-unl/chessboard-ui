@@ -44,6 +44,7 @@ export default function Chessboard() {
     let rowLabels = []
     let columnLabels = []
 
+    const [colorTurn, setTurn] = useState(1)
     const [initialGridX, setGridX] = useState(0)
     const [initialGridY, setGridY] = useState(0)
     const [pieces, setPieces] = useState<Piece[]>(initialBoardState)
@@ -191,7 +192,7 @@ export default function Chessboard() {
             const currentPiece = pieces.find((p) => p.verticalPosition === initialGridX && p.horizontalPosition === initialGridY)
 
             if (currentPiece) {
-                const isValidMove = referee.isValidMove(initialGridX, initialGridY, gridX, gridY, currentPiece.type, currentPiece.color, pieces)
+                const isValidMove = referee.isValidMove(initialGridX, initialGridY, gridX, gridY, currentPiece.type, currentPiece.color, pieces, colorTurn)
 
                 const enPassant = referee.isEnPassant(initialGridX, initialGridY, gridX, gridY, currentPiece.type, currentPiece.color, pieces)
 
@@ -218,6 +219,8 @@ export default function Chessboard() {
                     setPieces(updatePieces)
                 }
                 else if (isValidMove) {
+                    setTurn(-1 * colorTurn)
+
                     const updatePieces = pieces.reduce((results, piece) => {
                         if (piece.verticalPosition === initialGridX && piece.horizontalPosition === initialGridY) {
                             if (Math.abs(initialGridY - gridY) === 2 && piece.type === PieceType.PAWN) {

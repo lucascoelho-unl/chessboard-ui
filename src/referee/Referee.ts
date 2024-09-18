@@ -13,8 +13,16 @@ export default class Referee {
 		newY: number,
 		type: PieceType,
 		color: PieceColor,
-		boardState: Piece[]
+		boardState: Piece[],
+		turn: number
 	) {
+		if (
+			(turn === -1 && color === PieceColor.WHITE) ||
+			(turn === 1 && color === PieceColor.BLACK)
+		) {
+			return false;
+		}
+
 		if (type === PieceType.PAWN) {
 			const specialRow = color === PieceColor.WHITE ? 1 : 6;
 			const pawnDirection = color === PieceColor.WHITE ? 1 : -1;
@@ -49,6 +57,62 @@ export default class Referee {
 					return true;
 				}
 			}
+		}
+
+		if (type === PieceType.BISHOP) {
+			const numColsMoved = newX - prevX;
+			const numRowsMoved = newY - prevY;
+
+			if (Math.abs(numRowsMoved) !== Math.abs(numColsMoved)) {
+				return false;
+			}
+
+			var Xshift = numColsMoved > 0 ? 1 : -1;
+			var Yshift = numRowsMoved > 0 ? 1 : -1;
+			var Xpointer = Xshift;
+			var Ypointer = Yshift;
+
+			while (Xpointer !== numColsMoved && Ypointer !== numRowsMoved) {
+				if (
+					tileOcupied(prevX + Xpointer, prevY + Ypointer, boardState)
+				) {
+					return false;
+				}
+				Xpointer += Xshift;
+				Ypointer += Yshift;
+			}
+
+			if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
+				return false;
+			}
+			return true;
+		}
+
+		if (type === PieceType.KNIGHT) {
+			var validMoves = [
+				[1, 2],
+				[1, -2],
+				[-1, 2],
+				[-1, -2],
+				[2, 1],
+				[2, -1],
+				[-2, 1],
+				[-2, -1],
+			];
+
+			const knightMove = [newX - prevX, newY - prevY];
+
+			if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
+				return false;
+			}
+
+			for (var move of validMoves) {
+				console.log(knightMove, move, knightMove === move);
+				if (knightMove[0] === move[0] && knightMove[1] === move[1]) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		if (type === PieceType.ROOK) {
@@ -94,35 +158,94 @@ export default class Referee {
 			}
 		}
 
-		if (type === PieceType.BISHOP) {
+		if (type === PieceType.QUEEN) {
 			const numColsMoved = newX - prevX;
 			const numRowsMoved = newY - prevY;
-
-			if (Math.abs(numRowsMoved) !== Math.abs(numColsMoved)) {
-				return false;
-			}
-
 			var Xshift = numColsMoved > 0 ? 1 : -1;
 			var Yshift = numRowsMoved > 0 ? 1 : -1;
 			var Xpointer = Xshift;
 			var Ypointer = Yshift;
 
-			while (Xpointer !== numColsMoved && Ypointer !== numRowsMoved) {
-				if (
-					tileOcupied(prevX + Xpointer, prevY + Ypointer, boardState)
-				) {
+			if (prevX === newX) {
+				const numRowsMoved = newY - prevY;
+				if (numRowsMoved > 0) {
+					for (var i = 1; i < numRowsMoved; i++) {
+						if (tileOcupied(newX, prevY + i, boardState)) {
+							return false;
+						}
+					}
+				} else if (numRowsMoved < 0) {
+					for (var i = -1; i > numRowsMoved; i--) {
+						if (tileOcupied(newX, prevY + i, boardState)) {
+							return false;
+						}
+					}
+				}
+				if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
 					return false;
 				}
-				Xpointer += Xshift;
-				Ypointer += Yshift;
+				return true;
 			}
 
-			if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
-				return false;
+			if (prevY === newY) {
+				const numColsMoved = newX - prevX;
+				if (numColsMoved > 0) {
+					for (var i = 1; i < numColsMoved; i++) {
+						if (tileOcupied(prevX + i, newY, boardState)) {
+							return false;
+						}
+					}
+				} else if (numColsMoved < 0) {
+					for (var i = -1; i > numColsMoved; i--) {
+						if (tileOcupied(prevX + i, newY, boardState)) {
+							return false;
+						}
+					}
+				}
+				if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
+					return false;
+				}
+				return true;
+			}
+
+			if (Math.abs(numRowsMoved) === Math.abs(numColsMoved)) {
+				while (Xpointer !== numColsMoved && Ypointer !== numRowsMoved) {
+					if (
+						tileOcupied(
+							prevX + Xpointer,
+							prevY + Ypointer,
+							boardState
+						)
+					) {
+						return false;
+					}
+					Xpointer += Xshift;
+					Ypointer += Yshift;
+				}
+
+				if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
+					return false;
+				}
+				return true;
 			}
 		}
 
-		return true;
+		if (type === PieceType.KING) {
+			const numColsMoved = newX - prevX;
+			const numRowsMoved = newY - prevY;
+
+			if (
+				numColsMoved >= -1 &&
+				numColsMoved <= 1 &&
+				numRowsMoved >= -1 &&
+				numRowsMoved <= 1 &&
+				!tileOcupiedByTeammate(newX, newY, boardState, color)
+			) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	isEnPassant(
