@@ -1,5 +1,9 @@
 import { PieceType, PieceColor, Piece } from "../Types";
-import { tileOcupied, tileOcupiedByOponent } from "../Utils";
+import {
+	tileOcupied,
+	tileOcupiedByOponent,
+	tileOcupiedByTeammate,
+} from "../Utils";
 
 export default class Referee {
 	isValidMove(
@@ -11,12 +15,6 @@ export default class Referee {
 		color: PieceColor,
 		boardState: Piece[]
 	) {
-		// console.log(`Previous location: ${previousX}, ${previousY}`)
-		// console.log(`Current location: ${currentX}, ${currentY}`)
-		// console.log(`Piece type: ${type}`)
-		// console.log(`Piece color: ${color}`)
-		// console.log("-=-=-=-=-=-")
-
 		if (type === PieceType.PAWN) {
 			const specialRow = color === PieceColor.WHITE ? 1 : 6;
 			const pawnDirection = color === PieceColor.WHITE ? 1 : -1;
@@ -69,10 +67,7 @@ export default class Referee {
 						}
 					}
 				}
-				if (
-					tileOcupied(newX, newY, boardState) &&
-					!tileOcupiedByOponent(newX, newY, boardState, color)
-				) {
+				if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
 					return false;
 				}
 				return true;
@@ -92,16 +87,42 @@ export default class Referee {
 						}
 					}
 				}
-				if (
-					tileOcupied(newX, newY, boardState) &&
-					!tileOcupiedByOponent(newX, newY, boardState, color)
-				) {
+				if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
 					return false;
 				}
 				return true;
 			}
 		}
-		return false;
+
+		if (type === PieceType.BISHOP) {
+			const numColsMoved = newX - prevX;
+			const numRowsMoved = newY - prevY;
+
+			if (Math.abs(numRowsMoved) !== Math.abs(numColsMoved)) {
+				return false;
+			}
+
+			var Xshift = numColsMoved > 0 ? 1 : -1;
+			var Yshift = numRowsMoved > 0 ? 1 : -1;
+			var Xpointer = Xshift;
+			var Ypointer = Yshift;
+
+			while (Xpointer !== numColsMoved && Ypointer !== numRowsMoved) {
+				if (
+					tileOcupied(prevX + Xpointer, prevY + Ypointer, boardState)
+				) {
+					return false;
+				}
+				Xpointer += Xshift;
+				Ypointer += Yshift;
+			}
+
+			if (tileOcupiedByTeammate(newX, newY, boardState, color)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	isEnPassant(

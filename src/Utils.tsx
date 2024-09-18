@@ -98,6 +98,16 @@ export function inBoardBounds(x: number, y: number) {
 }
 
 
+export function tileOcupiedByTeammate(
+    x: number,
+    y: number,
+    boardState: Piece[],
+    color: PieceColor
+): boolean {
+    return (tileOcupied(x, y, boardState) && !tileOcupiedByOponent(x, y, boardState, color))
+}
+
+
 /**
  * Determines which piece is passed as an argument.
  * 
