@@ -23,6 +23,8 @@ export default class Referee {
 			return false;
 		}
 
+		console.log(boardState);
+
 		if (type === PieceType.PAWN) {
 			const specialRow = color === PieceColor.WHITE ? 1 : 6;
 			const pawnDirection = color === PieceColor.WHITE ? 1 : -1;

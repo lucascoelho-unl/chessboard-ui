@@ -219,8 +219,6 @@ export default function Chessboard() {
                     setPieces(updatePieces)
                 }
                 else if (isValidMove) {
-                    setTurn(-1 * colorTurn)
-
                     const updatePieces = pieces.reduce((results, piece) => {
                         if (piece.verticalPosition === initialGridX && piece.horizontalPosition === initialGridY) {
                             if (Math.abs(initialGridY - gridY) === 2 && piece.type === PieceType.PAWN) {
@@ -243,7 +241,9 @@ export default function Chessboard() {
                     }, [] as Piece[])
 
                     setPieces(updatePieces)
+                    setTurn(-1 * colorTurn)
                 }
+
                 activePiece.style.position = "relative"
                 activePiece.style.removeProperty("top")
                 activePiece.style.removeProperty("left")

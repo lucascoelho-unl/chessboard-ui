@@ -1,8 +1,27 @@
 import {
-    PieceType,
     PieceColor,
     Piece,
 } from "./Types";
+import { Pawn } from "./components/Pieces/Pawn"
+import { Knight } from "./components/Pieces/Knight"
+import { Bishop } from "./components/Pieces/Bishop"
+import { Rook } from "./components/Pieces/Rook"
+import { Queen } from "./components/Pieces/Queen"
+import { King } from "./components/Pieces/King"
+
+
+function createPiece(pieceType: string, x: number, y: number, image: string, color: PieceColor) {
+    const pieceClassMap: { [key: string]: any } = {
+        'p': Pawn,
+        'n': Knight,
+        'b': Bishop,
+        'r': Rook,
+        'q': Queen,
+        'k': King
+    };
+    const PieceClass = pieceClassMap[pieceType.toLowerCase()];
+    return new PieceClass(x, y, image, color);
+}
 
 
 /**
@@ -34,14 +53,15 @@ export function readBoard(position: string) {
         else {
             // If none of the base cases hit, create the piece instance.
             // Calls determine piece function to return what piece we are currently itterating.
-            let currPiece = determinePiece(currChar)
+            let currImage = determineImage(currChar)
             let currColor = determineColor(currChar)
-            let currType = determineType(currChar.toLocaleLowerCase())
 
             // If the piece is not an empty string, create a piece with a set position. 
-            if (currPiece !== "") {
-                pieces.push({ image: currPiece, horizontalPosition: rank, verticalPosition: file, type: currType, color: currColor })
+            if (currImage !== "") {
+                pieces.push(createPiece(currChar, rank, file, currImage, currColor))
                 file++
+                // { image: currPiece, horizontalPosition: rank, verticalPosition: file, type: currType, color: currColor }
+
             }
             // If the is an empty string, make it a number, and add to the file to properly handle FEN notation.
             else {
@@ -114,7 +134,7 @@ export function tileOcupiedByTeammate(
  * @param char 
  * @returns A path for the piece's .png. If not a valid piece, return empty string.
  */
-function determinePiece(char: string) {
+function determineImage(char: string) {
     let returnString = ""
     switch (char) {
         // Case for King.
@@ -142,39 +162,26 @@ function determinePiece(char: string) {
 }
 
 
-function determineType(char: string) {
-    switch (char) {
-        case "k": return PieceType.KING; break
-        case "q": return PieceType.QUEEN; break
-        case "r": return PieceType.ROOK; break
-        case "b": return PieceType.BISHOP; break
-        case "n": return PieceType.KNIGHT; break
-        case "p": return PieceType.PAWN; break
-        default: return PieceType.UNDEFINED;
-    }
-}
-
-
 function determineColor(char: string) {
     switch (char) {
         // Case for King.
-        case "k": return PieceColor.BLACK; break
-        case "K": return PieceColor.WHITE; break
+        case "k": return PieceColor.BLACK;
+        case "K": return PieceColor.WHITE;
         // Case for Queen.
-        case "q": return PieceColor.BLACK; break
-        case "Q": return PieceColor.WHITE; break
+        case "q": return PieceColor.BLACK;
+        case "Q": return PieceColor.WHITE;
         // Case for bishop
-        case "b": return PieceColor.BLACK; break
-        case "B": return PieceColor.WHITE; break
+        case "b": return PieceColor.BLACK;
+        case "B": return PieceColor.WHITE;
         // Case for knight
-        case "n": return PieceColor.BLACK; break
-        case "N": return PieceColor.WHITE; break
+        case "n": return PieceColor.BLACK;
+        case "N": return PieceColor.WHITE;
         // Case for rook
-        case "r": return PieceColor.BLACK; break
-        case "R": return PieceColor.WHITE; break
+        case "r": return PieceColor.BLACK;
+        case "R": return PieceColor.WHITE;
         // Case for pawn
-        case "p": return PieceColor.BLACK; break
-        case "P": return PieceColor.WHITE; break
+        case "p": return PieceColor.BLACK;
+        case "P": return PieceColor.WHITE;
         // Default case: empty string
         default: return PieceColor.WHITE;
     }

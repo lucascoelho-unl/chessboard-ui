@@ -8,9 +8,10 @@ export interface Piece {
     image: string;
     horizontalPosition: number;
     verticalPosition: number;
-    type: PieceType;
     color: PieceColor;
+    type: PieceType;
     enPassant?: boolean;
+    getPossibleMoves?(boardState: Piece[]): number[][];
 }
 
 export enum PieceColor {
